@@ -1,0 +1,8 @@
+{
+  "domain": "evo_start",
+  "name": "EVO-START Vehicle",
+  "version": "1.0.0",
+  "config_flow": true,
+  "requirements": [],
+  "codeowners": ["@quentin"]
+}
