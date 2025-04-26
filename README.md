@@ -1,3 +1,5 @@
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-%23FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/clarenneq)
+
 # 🧩 EVO-START – Home Assistant Custom Integration
 
 Custom integration for vehicles equipped with the **Fortin EVO-START** system, allowing vehicle status to be monitored in Home Assistant.
