@@ -1,3 +1,5 @@
+import asyncio
+
 from homeassistant.components.button import ButtonEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
@@ -35,8 +37,12 @@ class EvoStartButton(CoordinatorEntity, ButtonEntity):
     async def async_press(self) -> None:
         if self._cfg["action"] == "start":
             await self.coordinator.async_remote_start()
+            await asyncio.sleep(5)
+            await self.coordinator.async_request_refresh()
         elif self._cfg["action"] == "stop":
             await self.coordinator.async_remote_stop()
+            await asyncio.sleep(5)
+            await self.coordinator.async_request_refresh()
 
     @property
     def available(self) -> bool:

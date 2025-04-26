@@ -1,3 +1,5 @@
+import asyncio
+
 from homeassistant.components.lock import LockEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.components.lock import LockEntityFeature
@@ -46,11 +48,15 @@ class EvoStartLock(CoordinatorEntity, LockEntity):
         """Lock the vehicle remotely."""
         if self._flag_id == "vcl_lok" and self._cfg.get("actionable", False):
             await self.coordinator.async_remote_lock()
+            await asyncio.sleep(1)
+            await self.coordinator.async_request_refresh()
 
     async def async_unlock(self, **kwargs):
         """Unlock the vehicle remotely."""
         if self._flag_id == "vcl_lok" and self._cfg.get("actionable", False):
             await self.coordinator.async_remote_unlock()
+            await asyncio.sleep(1)
+            await self.coordinator.async_request_refresh()
 
     @property
     def available(self):

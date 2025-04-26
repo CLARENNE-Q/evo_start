@@ -1,0 +1,17 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Compte EVO-START",
+        "description": "Entrez vos identifiants EVO-START.",
+        "data": {
+          "email": "Adresse e-mail",
+          "password": "Mot de passe"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "EVO-START est déjà configuré."
+    }
+  }
+}
