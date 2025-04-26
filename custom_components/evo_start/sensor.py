@@ -58,6 +58,13 @@ SENSOR_TYPES = {
         "icon": "mdi:engine",
         "key": "vcl_eng",
         "transform": lambda x: "🟢 On" if str(x) == "1" else ("🔴 Off" if str(x) == "0" else "❓ Unknown")
+    },
+    "trunk_status": {
+        "name": "Trunk Status",
+        "unit": None,
+        "icon": "mdi:car-back",
+        "key": "dor_trk",
+        "transform": lambda x: "🔓 Open" if str(x) == "1" else ("🔒 Closed" if str(x) == "0" else "❓ Unknown")
     }
 }
 

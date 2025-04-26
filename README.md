@@ -55,29 +55,37 @@ Once installed, go to **Settings → Integrations**, then:
 
 ### 🔐 `lock.`
 
-| Entity                        | Description                     |
-|-------------------------------|---------------------------------|
-| `lock.evo_start_central_lock`  | Central lock (actionable)       |
-| `lock.evo_start_trunk`         | Trunk (read-only)               |
+| Entity                         | Description                |
+|---------------------------------|-----------------------------|
+| `lock.evo_start_central_lock`   | Central lock (actionable)   |
+
+### 🛎️ `button.`
+
+| Entity                          | Description                 |
+|----------------------------------|------------------------------|
+| `button.evo_start_remote_start`  | Start the vehicle remotely  |
+| `button.evo_start_remote_stop`   | Stop the vehicle remotely   |
 
 ### 🌡️ `sensor.`
 
-| Entity                                | Description                     |
-|--------------------------------------|---------------------------------|
-| `sensor.evo_start_battery_voltage`   | Battery voltage in V            |
-| `sensor.evo_start_vehicle_temperature` | Engine temperature             |
-| `sensor.evo_start_vehicle_mileage`   | Total mileage in km             |
-| `sensor.evo_start_vehicle_speed`     | Current speed in km/h           |
-| `sensor.evo_start_gsm_signal`         | GSM signal status               |
-| `sensor.evo_start_gps_online`         | GPS online status               |
-| `sensor.evo_start_engine_status`      | Engine status (on/off)          |
-| `sensor.evo_start_air_conditioning`   | Air conditioning status (on/off) |
+| Entity                                  | Description                          |
+|-----------------------------------------|--------------------------------------|
+| `sensor.evo_start_battery_voltage`      | Battery voltage (in volts)           |
+| `sensor.evo_start_vehicle_temperature`  | Engine temperature                   |
+| `sensor.evo_start_vehicle_mileage`      | Total mileage (in kilometers)        |
+| `sensor.evo_start_vehicle_speed`        | Current vehicle speed (in km/h)      |
+| `sensor.evo_start_gsm_signal`            | GSM network signal status            |
+| `sensor.evo_start_gps_online`            | GPS online connection status         |
+| `sensor.evo_start_engine_status`         | Engine running status (On/Off)       |
+| `sensor.evo_start_air_conditioning`      | Air conditioning status (On/Off)     |
+| `sensor.evo_start_trunk_status`          | Trunk open/closed status             |
 
 ### 📍 `device_tracker.`
 
-| Entity                             | Description                        |
-|------------------------------------|------------------------------------|
-| `device_tracker.evo_start_vehicle` | Vehicle GPS position (latitude/longitude) + all decoded flags (doors, lights, etc.) in attributes |
+| Entity                             | Description                                                           |
+|------------------------------------|-----------------------------------------------------------------------|
+| `device_tracker.evo_start_vehicle` | GPS position (latitude/longitude) with all flags (doors, lights, etc.) in attributes |
+
 
 ---
 
@@ -91,10 +99,7 @@ Once installed, go to **Settings → Integrations**, then:
 ---
 
 ## 📸 To Come
-
-- [ ] Support for `remote_start`, `lock`, `unlock` commands if API is confirmed
 - [ ] Multi-vehicle support
-- [ ] Full HACS validation (pending)
 
 ---
 

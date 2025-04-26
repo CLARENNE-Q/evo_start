@@ -4,5 +4,6 @@
   "version": "1.0.0",
   "config_flow": true,
   "requirements": [],
-  "codeowners": ["@quentin"]
+  "codeowners": ["@quentin"],
+  "platforms": ["lock", "sensor", "device_tracker", "button"]
 }

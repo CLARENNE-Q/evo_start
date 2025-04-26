@@ -209,3 +209,75 @@ class EvoStartCoordinator(DataUpdateCoordinator):
         except Exception as e:
             _LOGGER.exception("EVO-START: Error fetching data")
             raise UpdateFailed(str(e))
+
+    async def async_remote_start(self):
+        payload = self.build_payload("303120", uid=self.uid, ssk=self.ssk, tid=self.vehicle_data["tid"])
+        seq = str(int(datetime.now().timestamp() * 1000))
+
+        response = await asyncio.to_thread(
+            requests.post,
+            LOGIN_URL.format(seq=seq),
+            headers=HEADERS,
+            data=json.dumps(payload),
+            verify=False
+        )
+        if response.ok and response.json()["sys_head"]["ret_code"] == "000000":
+            _LOGGER.info("🚗 Remote start triggered successfully!")
+            return True
+        else:
+            _LOGGER.error(f"❌ Remote start failed. Response: {response.text}")
+            return False
+
+    async def async_remote_stop(self):
+        payload = self.build_payload("303125", uid=self.uid, ssk=self.ssk, tid=self.vehicle_data["tid"])
+        seq = str(int(datetime.now().timestamp() * 1000))
+
+        response = await asyncio.to_thread(
+            requests.post,
+            LOGIN_URL.format(seq=seq),
+            headers=HEADERS,
+            data=json.dumps(payload),
+            verify=False
+        )
+        if response.ok and response.json()["sys_head"]["ret_code"] == "000000":
+            _LOGGER.info("🛑 Remote stop triggered successfully!")
+            return True
+        else:
+            _LOGGER.error(f"❌ Remote stop failed. Response: {response.text}")
+            return False
+
+    async def async_remote_lock(self):
+        payload = self.build_payload("303110", uid=self.uid, ssk=self.ssk, tid=self.vehicle_data["tid"])
+        seq = str(int(datetime.now().timestamp() * 1000))
+
+        response = await asyncio.to_thread(
+            requests.post,
+            LOGIN_URL.format(seq=seq),
+            headers=HEADERS,
+            data=json.dumps(payload),
+            verify=False
+        )
+        if response.ok and response.json()["sys_head"]["ret_code"] == "000000":
+            _LOGGER.info("🔒 Remote lock triggered successfully!")
+            return True
+        else:
+            _LOGGER.error(f"❌ Remote lock failed. Response: {response.text}")
+            return False
+
+    async def async_remote_unlock(self):
+        payload = self.build_payload("303115", uid=self.uid, ssk=self.ssk, tid=self.vehicle_data["tid"])
+        seq = str(int(datetime.now().timestamp() * 1000))
+
+        response = await asyncio.to_thread(
+            requests.post,
+            LOGIN_URL.format(seq=seq),
+            headers=HEADERS,
+            data=json.dumps(payload),
+            verify=False
+        )
+        if response.ok and response.json()["sys_head"]["ret_code"] == "000000":
+            _LOGGER.info("🔓 Remote unlock triggered successfully!")
+            return True
+        else:
+            _LOGGER.error(f"❌ Remote unlock failed. Response: {response.text}")
+            return False
