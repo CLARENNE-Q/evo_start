@@ -45,13 +45,6 @@ SENSOR_TYPES = {
         "key": "gsmol",
         "transform": lambda x: "📶 OK" if x == "1" else "❌ No Signal"
     },
-    "air_conditioning": {
-        "name": "Air Conditioning",
-        "unit": None,
-        "icon": "mdi:fan",
-        "key": "vcl_air",
-        "transform": lambda x: "💨 On" if str(x) == "1" else ("🌙 Off" if str(x) == "0" else "❓ Unknown")
-    },
     "engine": {
         "name": "Engine Status",
         "unit": None,
