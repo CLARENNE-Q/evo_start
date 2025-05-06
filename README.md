@@ -79,7 +79,6 @@ Once installed, go to **Settings → Integrations**, then:
 | `sensor.evo_start_gsm_signal`            | GSM network signal status            |
 | `sensor.evo_start_gps_online`            | GPS online connection status         |
 | `sensor.evo_start_engine_status`         | Engine running status (On/Off)       |
-| `sensor.evo_start_air_conditioning`      | Air conditioning status (On/Off)     |
 | `sensor.evo_start_trunk_status`          | Trunk open/closed status             |
 
 ### 📍 `device_tracker.`
