@@ -94,8 +94,8 @@ class EvoStartCoordinator(DataUpdateCoordinator):
         self.password = password
         self.uid = None
         self.ssk = None
-        self.vehicle_data = None
-        self.flags = {}
+        self.vehicles_data = {}  # Dict indexed by vehicle ID
+        self.vehicles_flags = {}  # Dict of flags indexed by vehicle ID
 
     def sha1_password(self, password: str) -> str:
         return hashlib.sha1(password.encode("utf-8")).hexdigest().upper()
@@ -142,7 +142,7 @@ class EvoStartCoordinator(DataUpdateCoordinator):
             _LOGGER.exception("Exception during login")
         return False
 
-    async def get_vehicle_data(self):
+    async def get_vehicles_data(self):
         payload = self.build_payload("20101010", self.uid, self.ssk)
         seq = str(int(datetime.now().timestamp() * 1000))
         response = await asyncio.to_thread(
@@ -150,9 +150,11 @@ class EvoStartCoordinator(DataUpdateCoordinator):
             data=json.dumps(payload), verify=False
         )
         if response.ok:
-            return response.json()["body"]["rows"][0]
-        _LOGGER.error(f"❌ EVO-START: Failed to fetch vehicle data. Response: {response.text}")
-        raise Exception("Failed to fetch vehicle data")
+            vehicles = response.json()["body"]["rows"]
+            _LOGGER.info(f"✅ EVO-START: Found {len(vehicles)} vehicle(s)")
+            return vehicles
+        _LOGGER.error(f"❌ EVO-START: Failed to fetch vehicles data. Response: {response.text}")
+        raise Exception("Failed to fetch vehicles data")
 
     def decode_vst(self, vst: str):
         vst_cut = vst[:10]
@@ -197,21 +199,41 @@ class EvoStartCoordinator(DataUpdateCoordinator):
             if not await self.login():
                 raise UpdateFailed("Login failed")
 
-            self.vehicle_data = await self.get_vehicle_data()
-            vst = self.vehicle_data["lloc"]["vst"]
-            self.flags = self.decode_vst(vst)
+            vehicles = await self.get_vehicles_data()
+            vehicles_data = {}
+            vehicles_flags = {}
+            
+            for vehicle in vehicles:
+                vehicle_id = vehicle["tid"]
+                vst = vehicle["lloc"]["vst"]
+                flags = self.decode_vst(vst)
+                
+                vehicles_data[vehicle_id] = {
+                    "lloc": vehicle["lloc"],
+                    "carinfo": vehicle.get("carinfo", {}),
+                    "tid": vehicle["tid"]
+                }
+                vehicles_flags[vehicle_id] = flags
+                
+                _LOGGER.debug(f"📊 Vehicle {vehicle_id}: {vehicle.get('carinfo', {}).get('cname', 'Unknown')}")
+
+            self.vehicles_data = vehicles_data
+            self.vehicles_flags = vehicles_flags
 
             return {
-                "lloc": self.vehicle_data["lloc"],
-                "carinfo": self.vehicle_data.get("carinfo", {}),
-                "flags": self.flags
+                "vehicles": vehicles_data,
+                "flags": vehicles_flags
             }
         except Exception as e:
             _LOGGER.exception("EVO-START: Error fetching data")
             raise UpdateFailed(str(e))
 
-    async def async_remote_start(self):
-        payload = self.build_payload("303120", uid=self.uid, ssk=self.ssk, tid=self.vehicle_data["tid"])
+    async def async_remote_start(self, vehicle_id):
+        if vehicle_id not in self.vehicles_data:
+            _LOGGER.error(f"❌ Vehicle {vehicle_id} not found")
+            return False
+            
+        payload = self.build_payload("303120", uid=self.uid, ssk=self.ssk, tid=vehicle_id)
         seq = str(int(datetime.now().timestamp() * 1000))
 
         response = await asyncio.to_thread(
@@ -222,14 +244,18 @@ class EvoStartCoordinator(DataUpdateCoordinator):
             verify=False
         )
         if response.ok and response.json()["sys_head"]["ret_code"] == "000000":
-            _LOGGER.info("🚗 Remote start triggered successfully!")
+            _LOGGER.info(f"🚗 Remote start triggered successfully for vehicle {vehicle_id}!")
             return True
         else:
-            _LOGGER.error(f"❌ Remote start failed. Response: {response.text}")
+            _LOGGER.error(f"❌ Remote start failed for vehicle {vehicle_id}. Response: {response.text}")
             return False
 
-    async def async_remote_stop(self):
-        payload = self.build_payload("303125", uid=self.uid, ssk=self.ssk, tid=self.vehicle_data["tid"])
+    async def async_remote_stop(self, vehicle_id):
+        if vehicle_id not in self.vehicles_data:
+            _LOGGER.error(f"❌ Vehicle {vehicle_id} not found")
+            return False
+            
+        payload = self.build_payload("303125", uid=self.uid, ssk=self.ssk, tid=vehicle_id)
         seq = str(int(datetime.now().timestamp() * 1000))
 
         response = await asyncio.to_thread(
@@ -240,14 +266,18 @@ class EvoStartCoordinator(DataUpdateCoordinator):
             verify=False
         )
         if response.ok and response.json()["sys_head"]["ret_code"] == "000000":
-            _LOGGER.info("🛑 Remote stop triggered successfully!")
+            _LOGGER.info(f"🛑 Remote stop triggered successfully for vehicle {vehicle_id}!")
             return True
         else:
-            _LOGGER.error(f"❌ Remote stop failed. Response: {response.text}")
+            _LOGGER.error(f"❌ Remote stop failed for vehicle {vehicle_id}. Response: {response.text}")
             return False
 
-    async def async_remote_lock(self):
-        payload = self.build_payload("303110", uid=self.uid, ssk=self.ssk, tid=self.vehicle_data["tid"])
+    async def async_remote_lock(self, vehicle_id):
+        if vehicle_id not in self.vehicles_data:
+            _LOGGER.error(f"❌ Vehicle {vehicle_id} not found")
+            return False
+            
+        payload = self.build_payload("303110", uid=self.uid, ssk=self.ssk, tid=vehicle_id)
         seq = str(int(datetime.now().timestamp() * 1000))
 
         response = await asyncio.to_thread(
@@ -258,14 +288,18 @@ class EvoStartCoordinator(DataUpdateCoordinator):
             verify=False
         )
         if response.ok and response.json()["sys_head"]["ret_code"] == "000000":
-            _LOGGER.info("🔒 Remote lock triggered successfully!")
+            _LOGGER.info(f"🔒 Remote lock triggered successfully for vehicle {vehicle_id}!")
             return True
         else:
-            _LOGGER.error(f"❌ Remote lock failed. Response: {response.text}")
+            _LOGGER.error(f"❌ Remote lock failed for vehicle {vehicle_id}. Response: {response.text}")
             return False
 
-    async def async_remote_unlock(self):
-        payload = self.build_payload("303115", uid=self.uid, ssk=self.ssk, tid=self.vehicle_data["tid"])
+    async def async_remote_unlock(self, vehicle_id):
+        if vehicle_id not in self.vehicles_data:
+            _LOGGER.error(f"❌ Vehicle {vehicle_id} not found")
+            return False
+            
+        payload = self.build_payload("303115", uid=self.uid, ssk=self.ssk, tid=vehicle_id)
         seq = str(int(datetime.now().timestamp() * 1000))
 
         response = await asyncio.to_thread(
@@ -276,8 +310,20 @@ class EvoStartCoordinator(DataUpdateCoordinator):
             verify=False
         )
         if response.ok and response.json()["sys_head"]["ret_code"] == "000000":
-            _LOGGER.info("🔓 Remote unlock triggered successfully!")
+            _LOGGER.info(f"🔓 Remote unlock triggered successfully for vehicle {vehicle_id}!")
             return True
         else:
-            _LOGGER.error(f"❌ Remote unlock failed. Response: {response.text}")
+            _LOGGER.error(f"❌ Remote unlock failed for vehicle {vehicle_id}. Response: {response.text}")
             return False
+
+    def get_vehicle_data(self, vehicle_id):
+        """Get data for a specific vehicle."""
+        return self.vehicles_data.get(vehicle_id)
+    
+    def get_vehicle_flags(self, vehicle_id):
+        """Get flags for a specific vehicle."""
+        return self.vehicles_flags.get(vehicle_id, {})
+    
+    def get_all_vehicle_ids(self):
+        """Get list of all vehicle IDs."""
+        return list(self.vehicles_data.keys())
