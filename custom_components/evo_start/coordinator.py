@@ -235,16 +235,12 @@ class EvoStartCoordinator(DataUpdateCoordinator):
         
         # Ensure we have valid authentication before sending command
         if not self.uid or not self.ssk:
-            _LOGGER.warning("🔑 No valid authentication, attempting login...")
             if not await self.login():
                 _LOGGER.error("❌ Failed to authenticate before remote start")
                 return False
             
         payload = self.build_payload("303120", uid=self.uid, ssk=self.ssk, tid=vehicle_id)
         seq = str(int(datetime.now().timestamp() * 1000))
-        
-        _LOGGER.debug(f"🚗 Sending remote start command for vehicle {vehicle_id}")
-        _LOGGER.debug(f"📦 Payload: {payload}")
 
         try:
             response = await asyncio.to_thread(
@@ -267,7 +263,6 @@ class EvoStartCoordinator(DataUpdateCoordinator):
                 return True
             else:
                 _LOGGER.error(f"❌ Remote start failed for vehicle {vehicle_id}. Return code: {ret_code}")
-                _LOGGER.error(f"❌ Full response: {response.text}")
                 return False
                 
         except Exception as e:
@@ -281,16 +276,12 @@ class EvoStartCoordinator(DataUpdateCoordinator):
         
         # Ensure we have valid authentication before sending command
         if not self.uid or not self.ssk:
-            _LOGGER.warning("🔑 No valid authentication, attempting login...")
             if not await self.login():
                 _LOGGER.error("❌ Failed to authenticate before remote stop")
                 return False
             
         payload = self.build_payload("303125", uid=self.uid, ssk=self.ssk, tid=vehicle_id)
         seq = str(int(datetime.now().timestamp() * 1000))
-        
-        _LOGGER.debug(f"🛑 Sending remote stop command for vehicle {vehicle_id}")
-        _LOGGER.debug(f"📦 Payload: {payload}")
 
         try:
             response = await asyncio.to_thread(
@@ -313,7 +304,6 @@ class EvoStartCoordinator(DataUpdateCoordinator):
                 return True
             else:
                 _LOGGER.error(f"❌ Remote stop failed for vehicle {vehicle_id}. Return code: {ret_code}")
-                _LOGGER.error(f"❌ Full response: {response.text}")
                 return False
                 
         except Exception as e:
