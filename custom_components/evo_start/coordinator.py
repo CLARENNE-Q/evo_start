@@ -230,46 +230,94 @@ class EvoStartCoordinator(DataUpdateCoordinator):
 
     async def async_remote_start(self, vehicle_id):
         if vehicle_id not in self.vehicles_data:
-            _LOGGER.error(f"❌ Vehicle {vehicle_id} not found")
+            _LOGGER.error(f"❌ Vehicle {vehicle_id} not found in vehicles_data")
             return False
+        
+        # Ensure we have valid authentication before sending command
+        if not self.uid or not self.ssk:
+            _LOGGER.warning("🔑 No valid authentication, attempting login...")
+            if not await self.login():
+                _LOGGER.error("❌ Failed to authenticate before remote start")
+                return False
             
         payload = self.build_payload("303120", uid=self.uid, ssk=self.ssk, tid=vehicle_id)
         seq = str(int(datetime.now().timestamp() * 1000))
+        
+        _LOGGER.debug(f"🚗 Sending remote start command for vehicle {vehicle_id}")
+        _LOGGER.debug(f"📦 Payload: {payload}")
 
-        response = await asyncio.to_thread(
-            requests.post,
-            LOGIN_URL.format(seq=seq),
-            headers=HEADERS,
-            data=json.dumps(payload),
-            verify=False
-        )
-        if response.ok and response.json()["sys_head"]["ret_code"] == "000000":
-            _LOGGER.info(f"🚗 Remote start triggered successfully for vehicle {vehicle_id}!")
-            return True
-        else:
-            _LOGGER.error(f"❌ Remote start failed for vehicle {vehicle_id}. Response: {response.text}")
+        try:
+            response = await asyncio.to_thread(
+                requests.post,
+                LOGIN_URL.format(seq=seq),
+                headers=HEADERS,
+                data=json.dumps(payload),
+                verify=False
+            )
+            
+            if not response.ok:
+                _LOGGER.error(f"❌ HTTP error {response.status_code} for remote start: {response.text}")
+                return False
+                
+            response_data = response.json()
+            ret_code = response_data.get("sys_head", {}).get("ret_code")
+            
+            if ret_code == "000000":
+                _LOGGER.info(f"🚗 Remote start triggered successfully for vehicle {vehicle_id}!")
+                return True
+            else:
+                _LOGGER.error(f"❌ Remote start failed for vehicle {vehicle_id}. Return code: {ret_code}")
+                _LOGGER.error(f"❌ Full response: {response.text}")
+                return False
+                
+        except Exception as e:
+            _LOGGER.exception(f"❌ Exception during remote start for vehicle {vehicle_id}: {e}")
             return False
 
     async def async_remote_stop(self, vehicle_id):
         if vehicle_id not in self.vehicles_data:
-            _LOGGER.error(f"❌ Vehicle {vehicle_id} not found")
+            _LOGGER.error(f"❌ Vehicle {vehicle_id} not found in vehicles_data")
             return False
+        
+        # Ensure we have valid authentication before sending command
+        if not self.uid or not self.ssk:
+            _LOGGER.warning("🔑 No valid authentication, attempting login...")
+            if not await self.login():
+                _LOGGER.error("❌ Failed to authenticate before remote stop")
+                return False
             
         payload = self.build_payload("303125", uid=self.uid, ssk=self.ssk, tid=vehicle_id)
         seq = str(int(datetime.now().timestamp() * 1000))
+        
+        _LOGGER.debug(f"🛑 Sending remote stop command for vehicle {vehicle_id}")
+        _LOGGER.debug(f"📦 Payload: {payload}")
 
-        response = await asyncio.to_thread(
-            requests.post,
-            LOGIN_URL.format(seq=seq),
-            headers=HEADERS,
-            data=json.dumps(payload),
-            verify=False
-        )
-        if response.ok and response.json()["sys_head"]["ret_code"] == "000000":
-            _LOGGER.info(f"🛑 Remote stop triggered successfully for vehicle {vehicle_id}!")
-            return True
-        else:
-            _LOGGER.error(f"❌ Remote stop failed for vehicle {vehicle_id}. Response: {response.text}")
+        try:
+            response = await asyncio.to_thread(
+                requests.post,
+                LOGIN_URL.format(seq=seq),
+                headers=HEADERS,
+                data=json.dumps(payload),
+                verify=False
+            )
+            
+            if not response.ok:
+                _LOGGER.error(f"❌ HTTP error {response.status_code} for remote stop: {response.text}")
+                return False
+                
+            response_data = response.json()
+            ret_code = response_data.get("sys_head", {}).get("ret_code")
+            
+            if ret_code == "000000":
+                _LOGGER.info(f"🛑 Remote stop triggered successfully for vehicle {vehicle_id}!")
+                return True
+            else:
+                _LOGGER.error(f"❌ Remote stop failed for vehicle {vehicle_id}. Return code: {ret_code}")
+                _LOGGER.error(f"❌ Full response: {response.text}")
+                return False
+                
+        except Exception as e:
+            _LOGGER.exception(f"❌ Exception during remote stop for vehicle {vehicle_id}: {e}")
             return False
 
     async def async_remote_lock(self, vehicle_id):
