@@ -1,10 +1,10 @@
 {
   "name": "EVO-START",
-  "domains": ["lock", "sensor", "device_tracker"],
+  "domains": ["lock", "sensor", "device_tracker", "button"],
   "codeowners": ["@CLARENNE-Q"],
   "documentation": "https://github.com/CLARENNE-Q/iaqualink_iqpump01",
   "requirements": [],
-  "version": "1.0.0",
+  "version": "2.0.0",
   "config_flow": true,
   "render_readme": true
 }

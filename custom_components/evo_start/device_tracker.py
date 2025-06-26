@@ -54,30 +54,48 @@ ALERT_FLAGS = {
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    entity = EvoStartDeviceTracker(coordinator)
-    async_add_entities([entity])
+    entities = []
+    
+    # Create device tracker for each vehicle
+    for vehicle_id in coordinator.get_all_vehicle_ids():
+        vehicle_data = coordinator.get_vehicle_data(vehicle_id)
+        vehicle_name = vehicle_data.get("carinfo", {}).get("cname", f"Vehicle {vehicle_id}")
+        entities.append(EvoStartDeviceTracker(coordinator, vehicle_id, vehicle_name))
+    
+    async_add_entities(entities)
 
 class EvoStartDeviceTracker(CoordinatorEntity, TrackerEntity):
-    def __init__(self, coordinator):
+    def __init__(self, coordinator, vehicle_id, vehicle_name):
         super().__init__(coordinator)
-        self._attr_unique_id = "evo_start_vehicle_tracker"
-        self._attr_name = "EVO-START Vehicle"
+        self._vehicle_id = vehicle_id
+        self._vehicle_name = vehicle_name
+        self._attr_unique_id = f"evo_start_vehicle_tracker_{vehicle_id}"
+        self._attr_name = f"EVO-START {vehicle_name}"
         self._attr_icon = "mdi:car"
         self._attr_source_type = SourceType.GPS
 
     @property
     def latitude(self):
-        return float(self.coordinator.data["lloc"].get("lat"))
+        vehicle_data = self.coordinator.get_vehicle_data(self._vehicle_id)
+        if not vehicle_data:
+            return None
+        return float(vehicle_data["lloc"].get("lat"))
 
     @property
     def longitude(self):
-        return float(self.coordinator.data["lloc"].get("lng"))
+        vehicle_data = self.coordinator.get_vehicle_data(self._vehicle_id)
+        if not vehicle_data:
+            return None
+        return float(vehicle_data["lloc"].get("lng"))
 
     @property
     def extra_state_attributes(self):
-        flags = self.coordinator.data.get("flags", {})
+        vehicle_flags = self.coordinator.get_vehicle_flags(self._vehicle_id)
+        if not vehicle_flags:
+            return {}
+            
         attributes = {}
-        for key, value in flags.items():
+        for key, value in vehicle_flags.items():
             if value not in ("0", "1"):
                 continue
             label = FLAG_LABELS.get(key, key)
@@ -96,8 +114,8 @@ class EvoStartDeviceTracker(CoordinatorEntity, TrackerEntity):
     @property
     def device_info(self):
         return {
-            "identifiers": {(DOMAIN, "evo_start_vehicle")},
-            "name": self.coordinator.data.get("carinfo", {}).get("cname", "EVO-START Vehicle"),
+            "identifiers": {(DOMAIN, f"evo_start_vehicle_{self._vehicle_id}")},
+            "name": self._vehicle_name,
             "manufacturer": "Fortin",
             "model": "EVO-START",
             "entry_type": "service",

@@ -11,7 +11,8 @@ Custom integration for vehicles equipped with the **Fortin EVO-START** system, a
 - 🔐 Track **central lock** and **trunk** status
 - 🚗 Monitor **engine**, **air conditioning**, and **ACC** status
 - 📍 GPS position as a `device_tracker`
-- 🔋 Built-in sensors:
+- � **Multi-vehicle support** - All vehicles under your account are automatically detected
+- �🔋 Built-in sensors:
   - Battery voltage
   - Engine temperature
   - Mileage
@@ -55,37 +56,45 @@ Once installed, go to **Settings → Integrations**, then:
 
 ## 🧩 Created Entities
 
+**Note**: With multi-vehicle support, each vehicle creates its own set of entities. The vehicle name from your EVO-START account is included in entity names to distinguish between vehicles.
+
 ### 🔐 `lock.`
 
-| Entity                         | Description                |
-|---------------------------------|-----------------------------|
-| `lock.evo_start_central_lock`   | Central lock (actionable)   |
+| Entity                                    | Description                |
+|-------------------------------------------|----------------------------|
+| `lock.evo_start_{vehicle_name}_central_lock` | Central lock (actionable)   |
 
 ### 🛎️ `button.`
 
-| Entity                          | Description                 |
-|----------------------------------|------------------------------|
-| `button.evo_start_remote_start`  | Start the vehicle remotely  |
-| `button.evo_start_remote_stop`   | Stop the vehicle remotely   |
+| Entity                                     | Description                 |
+|--------------------------------------------|------------------------------|
+| `button.evo_start_{vehicle_name}_remote_start`  | Start the vehicle remotely  |
+| `button.evo_start_{vehicle_name}_remote_stop`   | Stop the vehicle remotely   |
 
 ### 🌡️ `sensor.`
 
-| Entity                                  | Description                          |
-|-----------------------------------------|--------------------------------------|
-| `sensor.evo_start_battery_voltage`      | Battery voltage (in volts)           |
-| `sensor.evo_start_vehicle_temperature`  | Engine temperature                   |
-| `sensor.evo_start_vehicle_mileage`      | Total mileage (in kilometers)        |
-| `sensor.evo_start_vehicle_speed`        | Current vehicle speed (in km/h)      |
-| `sensor.evo_start_gsm_signal`            | GSM network signal status            |
-| `sensor.evo_start_gps_online`            | GPS online connection status         |
-| `sensor.evo_start_engine_status`         | Engine running status (On/Off)       |
-| `sensor.evo_start_trunk_status`          | Trunk open/closed status             |
+| Entity                                            | Description                          |
+|---------------------------------------------------|--------------------------------------|
+| `sensor.evo_start_{vehicle_name}_battery_voltage`      | Battery voltage (in volts)           |
+| `sensor.evo_start_{vehicle_name}_vehicle_temperature`  | Engine temperature                   |
+| `sensor.evo_start_{vehicle_name}_vehicle_mileage`      | Total mileage (in kilometers)        |
+| `sensor.evo_start_{vehicle_name}_vehicle_speed`        | Current vehicle speed (in km/h)      |
+| `sensor.evo_start_{vehicle_name}_gsm_signal`            | GSM network signal status            |
+| `sensor.evo_start_{vehicle_name}_gps_online`            | GPS online connection status         |
+| `sensor.evo_start_{vehicle_name}_engine_status`         | Engine running status (On/Off)       |
+| `sensor.evo_start_{vehicle_name}_trunk_status`          | Trunk open/closed status             |
+| `sensor.evo_start_{vehicle_name}_door_lock_status`      | Door lock status (Locked/Unlocked)   |
+| `sensor.evo_start_{vehicle_name}_hood_status`           | Hood open/closed status              |
+| `sensor.evo_start_{vehicle_name}_left_front_door`       | Left front door open/closed status   |
+| `sensor.evo_start_{vehicle_name}_right_front_door`      | Right front door open/closed status  |
+| `sensor.evo_start_{vehicle_name}_left_rear_door`        | Left rear door open/closed status    |
+| `sensor.evo_start_{vehicle_name}_right_rear_door`       | Right rear door open/closed status   |
 
 ### 📍 `device_tracker.`
 
-| Entity                             | Description                                                           |
-|------------------------------------|-----------------------------------------------------------------------|
-| `device_tracker.evo_start_vehicle` | GPS position (latitude/longitude) with all flags (doors, lights, etc.) in attributes |
+| Entity                                       | Description                                                           |
+|----------------------------------------------|-----------------------------------------------------------------------|
+| `device_tracker.evo_start_{vehicle_name}` | GPS position (latitude/longitude) with all flags (doors, lights, etc.) in attributes |
 
 
 ---
@@ -96,11 +105,14 @@ Once installed, go to **Settings → Integrations**, then:
 - Data is refreshed every **60 seconds**.
 - Authentication uses a **SHA-1** password hash.
 - All binary flags (`VST`) are decoded, interpreted, and displayed in the attributes of the `device_tracker`.
+- **Multi-vehicle support**: All vehicles associated with your account are automatically discovered and configured.
+- Each vehicle gets its own device in Home Assistant with separate entities for complete control.
 
 ---
 
 ## 📸 To Come
-- [ ] Multi-vehicle support
+
+- [x] Multi-vehicle support ✅ **COMPLETED**
 
 ---
 
