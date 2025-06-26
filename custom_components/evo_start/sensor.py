@@ -67,7 +67,7 @@ SENSOR_TYPES = {
         "unit": None,
         "icon": "mdi:lock",
         "key": "vcl_lok",
-        "transform": lambda x: "🔒 Locked" if str(x) == "1" else ("🔓 Unlocked" if str(x) == "0" else "❓ Unknown")
+        "transform": lambda x: "🔓 Unlocked" if str(x) == "1" else ("🔒 Locked" if str(x) == "0" else "❓ Unknown")
     },
     "hood_status": {
         "name": "Hood Status",
