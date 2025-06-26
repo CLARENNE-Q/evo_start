@@ -83,6 +83,12 @@ Once installed, go to **Settings → Integrations**, then:
 | `sensor.evo_start_{vehicle_name}_gps_online`            | GPS online connection status         |
 | `sensor.evo_start_{vehicle_name}_engine_status`         | Engine running status (On/Off)       |
 | `sensor.evo_start_{vehicle_name}_trunk_status`          | Trunk open/closed status             |
+| `sensor.evo_start_{vehicle_name}_door_lock_status`      | Door lock status (Locked/Unlocked)   |
+| `sensor.evo_start_{vehicle_name}_hood_status`           | Hood open/closed status              |
+| `sensor.evo_start_{vehicle_name}_left_front_door`       | Left front door open/closed status   |
+| `sensor.evo_start_{vehicle_name}_right_front_door`      | Right front door open/closed status  |
+| `sensor.evo_start_{vehicle_name}_left_rear_door`        | Left rear door open/closed status    |
+| `sensor.evo_start_{vehicle_name}_right_rear_door`       | Right rear door open/closed status   |
 
 ### 📍 `device_tracker.`
 

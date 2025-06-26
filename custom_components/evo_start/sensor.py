@@ -61,6 +61,48 @@ SENSOR_TYPES = {
         "icon": "mdi:car-back",
         "key": "dor_trk",
         "transform": lambda x: "🔓 Open" if str(x) == "1" else ("🔒 Closed" if str(x) == "0" else "❓ Unknown")
+    },
+    "door_lock_status": {
+        "name": "Door Lock Status",
+        "unit": None,
+        "icon": "mdi:lock",
+        "key": "vcl_lok",
+        "transform": lambda x: "🔒 Locked" if str(x) == "1" else ("🔓 Unlocked" if str(x) == "0" else "❓ Unknown")
+    },
+    "hood_status": {
+        "name": "Hood Status",
+        "unit": None,
+        "icon": "mdi:car-hood",
+        "key": "dor_frn",
+        "transform": lambda x: "🔓 Open" if str(x) == "1" else ("🔒 Closed" if str(x) == "0" else "❓ Unknown")
+    },
+    "left_front_door": {
+        "name": "Left Front Door",
+        "unit": None,
+        "icon": "mdi:car-door",
+        "key": "dor_lf",
+        "transform": lambda x: "🔓 Open" if str(x) == "1" else ("🔒 Closed" if str(x) == "0" else "❓ Unknown")
+    },
+    "right_front_door": {
+        "name": "Right Front Door",
+        "unit": None,
+        "icon": "mdi:car-door",
+        "key": "dor_rf",
+        "transform": lambda x: "🔓 Open" if str(x) == "1" else ("🔒 Closed" if str(x) == "0" else "❓ Unknown")
+    },
+    "left_rear_door": {
+        "name": "Left Rear Door",
+        "unit": None,
+        "icon": "mdi:car-door",
+        "key": "dor_lb",
+        "transform": lambda x: "🔓 Open" if str(x) == "1" else ("🔒 Closed" if str(x) == "0" else "❓ Unknown")
+    },
+    "right_rear_door": {
+        "name": "Right Rear Door",
+        "unit": None,
+        "icon": "mdi:car-door",
+        "key": "dor_rb",
+        "transform": lambda x: "🔓 Open" if str(x) == "1" else ("🔒 Closed" if str(x) == "0" else "❓ Unknown")
     }
 }
 
