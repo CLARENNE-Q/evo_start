@@ -1,34 +1,68 @@
+"""Point d'entrée principal et initialisation sécurisée du composant EVO-START."""
+from __future__ import annotations
+
+import logging
+
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 
 from .const import DOMAIN
-from .coordinator import EvoStartCoordinator
+from .coordinator import CoordinateurEvoStart
 
-async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Set up the EVO-START component."""
+JOURNALISEUR = logging.getLogger(__name__)
+
+# Liste centralisée des plateformes d'entités prises en charge
+PLATEFORMES_SUPPORTEES: list[Platform] = [
+    Platform.SENSOR,
+    Platform.LOCK,
+    Platform.DEVICE_TRACKER,
+    Platform.BUTTON,
+]
+
+
+async def async_setup(hass: HomeAssistant, configuration: ConfigType) -> bool:
+    """Initialiser le composant racine (conservé pour rétrocompatibilité du noyau)."""
     return True
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up EVO-START from a config entry."""
-    email = entry.data["email"]
-    password = entry.data["password"]
 
-    coordinator = EvoStartCoordinator(hass, email, password)
-    await coordinator.async_config_entry_first_refresh()
+async def async_setup_entry(
+    hass: HomeAssistant, entree_configuration: ConfigEntry
+) -> bool:
+    """Initialiser et charger les entités associées à une entrée de configuration."""
+    courriel = entree_configuration.data[CONF_EMAIL]
+    mot_de_passe = entree_configuration.data[CONF_PASSWORD]
+
+    coordinateur = CoordinateurEvoStart(
+        hass=hass,
+        courriel=courriel,
+        mot_de_passe=mot_de_passe,
+    )
+
+    # Récupération initiale obligatoire des données télémétriques avant le montage des entités
+    await coordinateur.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = coordinator
+    hass.data[DOMAIN][entree_configuration.entry_id] = coordinateur
 
-    # Charger les plateformes
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setups(entry, ["sensor", "lock", "device_tracker", "button"])
+    # Transmission synchrone et attendue aux gestionnaires de plateformes
+    await hass.config_entries.async_forward_entry_setups(
+        entree_configuration, PLATEFORMES_SUPPORTEES
     )
 
     return True
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Unload EVO-START entry."""
-    if unload_ok := await hass.config_entries.async_unload_platforms(entry, ["sensor", "lock", "device_tracker", "button"]):
-        hass.data[DOMAIN].pop(entry.entry_id)
-    return unload_ok
+
+async def async_unload_entry(
+    hass: HomeAssistant, entree_configuration: ConfigEntry
+) -> bool:
+    """Décharger proprement les entités et libérer les descripteurs de session."""
+    dechargement_reussi = await hass.config_entries.async_unload_platforms(
+        entree_configuration, PLATEFORMES_SUPPORTEES
+    )
+
+    if dechargement_reussi:
+        hass.data[DOMAIN].pop(entree_configuration.entry_id, None)
+
+    return dechargement_reussi

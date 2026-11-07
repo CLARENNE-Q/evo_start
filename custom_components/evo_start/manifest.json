@@ -1,9 +1,12 @@
 {
   "domain": "evo_start",
-  "name": "EVO-START Vehicle",
+  "name": "EVO-START",
   "version": "2.0.0",
   "config_flow": true,
+  "documentation": "https://github.com/CLARENNE-Q/evo_start",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/CLARENNE-Q/evo_start/issues",
   "requirements": [],
-  "codeowners": ["@quentin"],
-  "platforms": ["lock", "sensor", "device_tracker", "button"]
+  "codeowners": ["@CLARENNE-Q"]
 }
